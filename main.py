@@ -51,8 +51,8 @@ save_data("prices",dfprices)
 save_data("products",dfproducts)
 
 ## Leitura do segundo esquema e criação da tabela
-'''schema2 = read_schema("./archives/schema2.sql")
-create_tables(schema2)'''
+schema2 = read_schema("./archives/schema2.sql")
+create_tables(schema2)
 
 ##
 '''merge = pd.merge(localization,prices, on = "id")
