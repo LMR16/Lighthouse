@@ -29,6 +29,23 @@ data_filtrado = df[(df.iloc[:, 10] == 'GASOLINA') &
 ## Salvar arquivos filtrados em Json
 result = data_filtrado.to_json("./archives/target/result.json",orient="index")
 
+## Média, moda, mediana dos valores
+preco = pd.to_numeric(df.iloc[:, 12].replace(',', '.', regex=True), errors='coerce')
+
+media = preco.mean()
+moda = preco.mode()[0] ## "[0]" Retorna o primeiro valor da matriz
+mediana = preco.median()
+
+
+df_statistis = pd.DataFrame({
+                'media': [media],
+                'mediana': [mediana],
+                'moda': [moda]
+                })
+
+## Salvar dataframe em /target
+result_st = df_statistis.to_json("./archives/target/restult_st.json", orient="index")
+
 ## Seguda pipeline (B)
 
 ## Leitura do esquema e criação da tabela
@@ -54,6 +71,15 @@ save_data("products",dfproducts)
 schema2 = read_schema("./archives/schema2.sql")
 create_tables(schema2)
 
-##
-'''merge = pd.merge(localization,prices, on = "id")
-print(merge)'''
+## opias dos dataframes
+dflocals2 = dflocals.copy()
+dfprices2 = dfprices.copy()
+dfproducts2 = dfproducts.copy()
+
+## Mesclando os CSVs em um
+mapping = dfproducts2.set_index('id')['produto'].to_dict()      ## Tranformando df em um dict
+dfprices2['produto'] = dfprices2['produto'].map(mapping)        ## Usando .map para alterar os valores em dfprices2
+pricing_information = dfprices2.merge(localization, on='id')    ## Mesclando com "localizations"
+
+## Salvando na tabela
+save_data("pricing_information",pricing_information)
